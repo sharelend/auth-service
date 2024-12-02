@@ -1,0 +1,41 @@
+version: "3.9"
+
+services:
+  api-gateway:
+    image: sharelend/api-gateway:latest  # Image from Docker Hub or your own registry
+    container_name: api-gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      - auth-service
+    networks:
+      - sharelend-network
+
+  auth-service:
+    image: sharelend/auth-service:latest  # Image from Docker Hub or your own registry
+    container_name: auth-service
+    ports:
+      - "50051:50051"
+    networks:
+      - sharelend-network
+
+  database:
+    image: postgres:15
+    container_name: sharelend-db
+    environment:
+      POSTGRES_USER: sharelend_user
+      POSTGRES_PASSWORD: sharelend_password
+      POSTGRES_DB: sharelend
+    ports:
+      - "5432:5432"
+    networks:
+      - sharelend-network
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+networks:
+  sharelend-network:
+    driver: bridge
+
+volumes:
+  db-data:
